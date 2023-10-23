@@ -16,7 +16,7 @@ router.post('/signup',
     userController.signup
 );
 router.post('/login',
-    body('username').trim().isLength({ min: 4 }).withMessage("Please enter a valid username"),
+    body('email').trim().notEmpty().isEmail().withMessage("Please enter a valid email address"),
     body('password').isLength({ min: 8 }).withMessage("Password should be greater than 8"),
     validationResults,
     userController.login
