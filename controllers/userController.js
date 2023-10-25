@@ -38,12 +38,24 @@ exports.login = async (req, res) => {
         const isCorrectPassword = await bcrypt.compare(password, user.password);
         if (isCorrectPassword) {
             const token = jwt.sign({ userId: user._id, username: user.username, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
-            return res.status(200).json({ message: "Success, re-directing you to your dashboard", token: token });
+            res.cookie('authToken', token, {
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000
+            });
+            return res.status(200).json({ message: "Success, re-directing you to your dashboard" });
         } else {
             res.status(401).json({ message: "Wrong credentials, please re-enter" });
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Server Failure" });
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
+exports.verifyAuth = async (req, res) => {
+    try {
+        res.status(404).json({ message: "User not logged in" });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}

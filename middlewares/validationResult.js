@@ -5,7 +5,7 @@ const validationResults = (req, res, next) => {
     if (result.isEmpty()) {
         return next();
     }
-    res.status(400).json({ errors: result.array() });
+    res.status(400).json({ errors: result.array(), message: "Enter valid credentials" });
 }
 
 module.exports = {
