@@ -33,7 +33,6 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use('/user', userRoutes);
-
 app.get('/test', verifyUser, (req, res) => {
     res.json({ message: req.cookies["authToken"], user: req.user });
 });

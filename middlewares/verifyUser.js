@@ -19,7 +19,6 @@ const verifyUser = async (req, res, next) => {
         return res.status(401).json({ name: error.name, message: error.message });
     }
 }
-
 module.exports = {
     verifyUser
 }
