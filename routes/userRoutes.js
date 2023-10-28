@@ -3,6 +3,7 @@ const { body } = require('express-validator');
 
 const userController = require('../controllers/userController');
 const { validationResults } = require('../middlewares/validationResult');
+const { verifyUser } = require('../middlewares/verifyUser');
 
 const router = express.Router();
 
@@ -22,5 +23,10 @@ router.post('/login',
     userController.login
 );
 
+router.get('/logout',
+    userController.logout
+);
+
+router.get('/verifyAuth', verifyUser, userController.verifyAuth);
 
 module.exports = router;

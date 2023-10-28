@@ -29,7 +29,6 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        console.log("Here");
 
         if (!user) {
             return res.status(404).json({ message: "User not found, sign in" });
@@ -51,9 +50,28 @@ exports.login = async (req, res) => {
     }
 };
 
+
+exports.logout = async (req, res) => {
+    try {
+        res.clearCookie('authToken', {
+            httpOnly: true
+        });
+        res.status(200).json({ message: "You have been successfully logged out" });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
 exports.verifyAuth = async (req, res) => {
     try {
-        res.status(404).json({ message: "User not logged in" });
+        console.log(req.user);
+        res.status(200).json({
+            user: {
+                email: req.user.email,
+                username: req.user.username,
+                userId: req.user.userId
+            }, message: "User is authorized"
+        });
     } catch (error) {
         res.status(500).json({ message: "Internal Server Error" });
     }
