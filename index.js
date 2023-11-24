@@ -5,6 +5,7 @@ const app = express();
 require('dotenv').config();
 
 const userRoutes = require('./routes/userRoutes');
+const fileRoutes = require('./routes/fileRoutes');
 
 const { verifyUser } = require('./middlewares/verifyUser');
 
@@ -33,9 +34,11 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use('/user', userRoutes);
+app.use('/file', verifyUser, fileRoutes);
 app.get('/test', verifyUser, (req, res) => {
     res.json({ message: req.cookies["authToken"], user: req.user });
 });
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
