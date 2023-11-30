@@ -8,7 +8,7 @@ const fileSchema = new mongoose.Schema({
     runtime: {
         type: String,
         required: true,
-        enum: ["PY", "JS", "CPP"]
+        enum: ["PY", "JS", "CPP", "file"]
     },
     createdAt: {
         type: Date,
