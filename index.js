@@ -11,7 +11,7 @@ const { verifyUser } = require('./middlewares/verifyUser');
 
 const port = process.env.PORT | 8080;
 
-mongoose.connect('mongodb://localhost/onlinecompiler', {
+mongoose.connect('mongodb://127.0.0.1/onlinecompiler', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
@@ -34,7 +34,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use('/user', userRoutes);
-app.use('/file', verifyUser, fileRoutes);
+app.use('/file', fileRoutes);
 app.get('/test', verifyUser, (req, res) => {
     res.json({ message: req.cookies["authToken"], user: req.user });
 });

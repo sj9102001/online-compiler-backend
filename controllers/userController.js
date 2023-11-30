@@ -69,7 +69,6 @@ exports.logout = async (req, res) => {
 
 exports.verifyAuth = async (req, res) => {
     try {
-        console.log(req.user);
         res.status(200).json({
             user: {
                 email: req.user.email,

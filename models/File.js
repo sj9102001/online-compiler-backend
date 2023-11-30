@@ -35,7 +35,7 @@ fileSchema.pre('save', function (next) {
                 this.content = 'console.log("Hello, World!");'; // Default JavaScript code
                 break;
             case 'CPP':
-                this.content = '#include <iostream>\nint main() { std::cout << "Hello, World!" << std::endl; return 0; }'; // Default C++ code
+                this.content = '#include <iostream>\nint main() {\n std::cout << "Hello, World!" << std::endl;\n return 0; }'; // Default C++ code
                 break;
             default:
                 this.content = ''; // Default empty content
