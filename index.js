@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const userRoutes = require('./routes/userRoutes');
 const fileRoutes = require('./routes/fileRoutes');
+const executeRoutes = require('./routes/executeRoutes');
 
 const { verifyUser } = require('./middlewares/verifyUser');
 
@@ -35,6 +36,7 @@ app.use(express.json());
 
 app.use('/user', userRoutes);
 app.use('/file', fileRoutes);
+app.use('/execute', executeRoutes);
 app.get('/test', verifyUser, (req, res) => {
     res.json({ message: req.cookies["authToken"], user: req.user });
 });
