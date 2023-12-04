@@ -1,76 +1,38 @@
-const Docker = require('dockerode');
-const fs = require('fs');
+const File = require('../models/File');
 const path = require('path');
-
-const docker = new Docker();
-
-async function createContainer(code) {
-    const codePath = path.join(__dirname, 'userCode.js');
-    fs.writeFileSync(codePath, code);
-
-    try {
-        await docker.getImage('node:14').inspect();
-    } catch (error) {
-        console.log('Pulling Node.js 14 image from Docker Hub...');
-        await docker.pull('node:14');
-    }
-
-    const workingDir = '/usr/src/app';
-
-    try {
-        const container = await docker.createContainer({
-            Image: 'node:14',
-            Cmd: ['node', `${workingDir}/userCode.js`],
-            HostConfig: {
-                Binds: [`${__dirname}:${workingDir}`],
-            },
-            WorkingDir: workingDir,
-        });
-
-        return container;
-    } catch (error) {
-        console.error('Error creating Docker container:', error);
-        throw error;
-    }
-}
-async function execute(container) {
-    try {
-        await container.start();
-        const stream = await container.logs({ follow: true, stdout: true, stderr: true, encoding: 'utf-8' });
-        return new Promise((resolve, reject) => {
-            let data = '';
-
-            stream.on('data', (chunk) => {
-                data += chunk.toString('utf-8');
-            });
-
-            stream.on('end', () => {
-                const cleanedData = data.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '');
-                resolve(cleanedData);
-            });
-
-            stream.on('error', (error) => {
-                reject(error);
-            });
-        });
-    } catch (error) {
-        console.error('Error executing code:', error);
-        throw error;
-    } finally {
-        await container.stop();
-        await container.remove();
-    }
-}
-
+const { createContainer, execute } = require('../utils/dockerUtils');
 
 exports.executeCode = async (req, res) => {
-    const code = req.body.code;
+    const fileId = req.body.fileId;
+
     try {
-        const container = await createContainer(code);
-        const result = await execute(container);
-        res.json({ result: result });
+        const file = await File.findById(fileId);
+        const code = file.content;
+        const runtime = file.runtime;
+        let container;
+        let result;
+        const pathToFile = path.join(__dirname, '..', 'codefile');
+        switch (runtime) {
+            case "JS":
+                container = await createContainer('node:14', ['node', '/usr/src/app/userCode.js'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "JS");
+                result = await execute(container);
+                break;
+            case "PY":
+                container = await createContainer('python:3', ['python', 'userCode.py'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "PY");
+                result = await execute(container);
+                break;
+            // case "CPP":
+            //     container = await createContainerCPP();
+            //     result = await executeCPP();
+            //     break;
+            default:
+                result = "File Not Executable"
+                break;
+        }
+
+        res.json({ result: result, fileId: fileId, runtime: runtime });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
+        console.log(error);
+        res.status(500).send("Internal Server Error");
     }
 }

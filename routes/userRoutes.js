@@ -7,8 +7,6 @@ const { verifyUser } = require('../middlewares/verifyUser');
 
 const router = express.Router();
 
-
-
 router.post('/signup',
     body('email').trim().notEmpty().isEmail().withMessage("Please enter a valid email address"),
     body('username').trim().isLength({ min: 4 }).withMessage("Please enter a valid username"),
