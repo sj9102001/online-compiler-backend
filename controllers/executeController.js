@@ -18,7 +18,7 @@ exports.executeCode = async (req, res) => {
                 result = await execute(container);
                 break;
             case "PY":
-                container = await createContainer('python:3', ['python', 'userCode.py'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "PY");
+                container = await createContainer('python:3.9.18-alpine3.18', ['python', '/usr/src/app/userCode.py'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "PY");
                 result = await execute(container);
                 break;
             // case "CPP":
