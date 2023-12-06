@@ -22,6 +22,40 @@ exports.executeCode = async (req, res) => {
                 result = await execute(container);
                 break;
             // case "CPP":
+            //     container = await createContainer();
+            //     result = await execute();
+            //     break;
+            default:
+                result = "File Not Executable"
+                break;
+        }
+
+        res.json({ result: result, fileId: fileId, runtime: runtime });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+
+exports.basicPlanExecute = async (req, res) => {
+    const code = req.body.code;
+    const runtime = req.body.runtime;
+
+    try {
+        let container;
+        let result;
+        const pathToFile = path.join(__dirname, '..', 'codefile');
+        switch (runtime) {
+            case "JS":
+                container = await createContainer('node:14', ['node', '/usr/src/app/userCode.js'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "JS");
+                result = await execute(container);
+                break;
+            case "PY":
+                container = await createContainer('python:3.9.18-alpine3.18', ['python', '/usr/src/app/userCode.py'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "PY");
+                result = await execute(container);
+                break;
+            // case "CPP":
             //     container = await createContainerCPP();
             //     result = await executeCPP();
             //     break;
@@ -30,7 +64,7 @@ exports.executeCode = async (req, res) => {
                 break;
         }
 
-        res.json({ result: result, fileId: fileId, runtime: runtime });
+        res.json({ result: result, runtime: runtime });
     } catch (error) {
         console.log(error);
         res.status(500).send("Internal Server Error");
