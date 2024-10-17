@@ -1,5 +1,4 @@
 const File = require('../models/File');
-const path = require('path');
 const { createContainer, execute } = require('../utils/dockerUtils');
 
 exports.executeCode = async (req, res) => {
@@ -11,14 +10,27 @@ exports.executeCode = async (req, res) => {
         const runtime = file.runtime;
         let container;
         let result;
-        const pathToFile = path.join(__dirname, '..', 'codefile');
+        let cmd;
+        // const pathToFile = path.join(__dirname, '..', 'codefile');
         switch (runtime) {
             case "JS":
-                container = await createContainer('node:14', ['node', '/usr/src/app/userCode.js'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "JS");
+                // cmd = ['node', '/usr/src/app/userCode.js']
+                cmd = ['node', '-e', 'eval(process.env.CODE)']
+                // container = await createContainer('node:14', cmd, [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "JS");
+                container = await createContainer('node:14', cmd, code, "JS");
                 result = await execute(container);
                 break;
             case "PY":
-                container = await createContainer('python:3.9.18-alpine3.18', ['python', '/usr/src/app/userCode.py'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "PY");
+                // cmd = ['python', '/usr/src/app/userCode.py']
+                cmd = ['python', '-c', 'import os; exec(os.getenv("CODE"))']
+                // container = await createContainer('python:3.9.18-alpine3.18', cmd, [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "PY");
+                container = await createContainer('python:3.9.18-alpine3.18', cmd, code, "PY");
+                result = await execute(container);
+                break;
+            case "DART":
+                cmd = ['dart', 'run', '-c', 'import "dart:io"; void main() { print(Platform.environment["CODE"]); }'];
+                // container = await createContainer("dart:latest", ["dart", "/usr/src/app/userCode.dart"], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "DART");
+                container = await createContainer("dart:latest", cmd, code, "DART");
                 result = await execute(container);
                 break;
             // case "CPP":
@@ -29,7 +41,6 @@ exports.executeCode = async (req, res) => {
                 result = "File Not Executable"
                 break;
         }
-
         res.json({ result: result, fileId: fileId, runtime: runtime });
     } catch (error) {
         console.log(error);
@@ -41,23 +52,33 @@ exports.executeCode = async (req, res) => {
 exports.basicPlanExecute = async (req, res) => {
     const code = req.body.code;
     const runtime = req.body.runtime;
-
     try {
         let container;
         let result;
-        const pathToFile = path.join(__dirname, '..', 'codefile');
+        let cmd;
+        // const pathToFile = path.join(__dirname, '..', 'codefile');
         switch (runtime) {
             case "JS":
-                container = await createContainer('node:14', ['node', '/usr/src/app/userCode.js'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "JS");
+                cmd = ['node', '-e', 'eval(process.env.CODE)']
+                // container = await createContainer('node:14', ['node', '/usr/src/app/userCode.js'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "JS");
+                container = await createContainer('node:14', cmd, code, "JS");
                 result = await execute(container);
                 break;
             case "PY":
-                container = await createContainer('python:3.9.18-alpine3.18', ['python', '/usr/src/app/userCode.py'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "PY");
+                cmd = ['python', '-c', 'import os; exec(os.getenv("CODE"))']
+                // container = await createContainer('python:3.9.18-alpine3.18', ['python', '/usr/src/app/userCode.py'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "PY");
+                container = await createContainer('python:3.9.18-alpine3.18', cmd, code, "PY");
+                result = await execute(container);
+                break;
+            case "DART":
+                cmd = ['dart', 'run', '-c', 'import "dart:io"; void main() { print(Platform.environment["CODE"]); }'];
+                // container = await createContainer("dart:latest", ["dart", "/usr/src/app/userCode.dart"], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "DART");
+                container = await createContainer("dart:latest", cmd, code, "DART");
                 result = await execute(container);
                 break;
             // case "CPP":
-            //     container = await createContainerCPP();
-            //     result = await executeCPP();
+            //     container = await createContainer('gcc:latest', ['g++', '/usr/src/app/userCode.cpp', '-o', '/usr/src/app/userCode'], [`${pathToFile}:/usr/src/app`], '/usr/src/app', code, "CPP");
+            //     result = await execute(container);
             //     break;
             default:
                 result = "File Not Executable"

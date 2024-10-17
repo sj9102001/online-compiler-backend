@@ -4,9 +4,10 @@ const docker = new Docker();
 const fs = require('fs');
 const path = require('path');
 
-async function createContainer(image, cmd, binds, workingDir, code, runtime) {
-    const codePath = path.join(__dirname, '..', 'codefile', `userCode.${runtime.toLowerCase()}`);
-    fs.writeFileSync(codePath, code);
+async function createContainer(image, cmd, code, runtime) {
+    //  binds, workingDir
+    // const codePath = path.join(__dirname, '..', 'codefile', `userCode.${runtime.toLowerCase()}`);
+    // fs.writeFileSync(codePath, code);
 
     try {
         await docker.getImage(image).inspect();
@@ -19,10 +20,11 @@ async function createContainer(image, cmd, binds, workingDir, code, runtime) {
         const container = await docker.createContainer({
             Image: image,
             Cmd: cmd,
-            HostConfig: {
-                Binds: binds,
-            },
-            WorkingDir: workingDir,
+            Env: [`CODE=${code}`],
+            // HostConfig: {
+            //     Binds: binds,
+            // },
+            // WorkingDir: workingDir,
         });
 
         return container;
@@ -58,7 +60,7 @@ async function execute(container) {
         throw error;
     } finally {
         await container.stop();
-        await container.remove();
+        // await container.remove();
     }
 }
 

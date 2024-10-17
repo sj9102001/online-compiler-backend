@@ -8,7 +8,7 @@ const fileSchema = new mongoose.Schema({
     runtime: {
         type: String,
         required: true,
-        enum: ["PY", "JS", "CPP", "file"]
+        enum: ["PY", "JS", "CPP", "DART", "file"]
     },
     createdAt: {
         type: Date,
@@ -29,16 +29,19 @@ fileSchema.pre('save', function (next) {
     if (this.isNew) {
         switch (this.runtime) {
             case 'PY':
-                this.content = 'print("Hello, World!")'; // Default Python code
+                this.content = 'print("Hello, World!")';
                 break;
             case 'JS':
-                this.content = 'console.log("Hello, World!");'; // Default JavaScript code
+                this.content = 'console.log("Hello, World!");';
                 break;
             case 'CPP':
-                this.content = '#include <iostream>\nint main() {\n std::cout << "Hello, World!" << std::endl;\n return 0; }'; // Default C++ code
+                this.content = '#include <iostream>\nint main() {\n std::cout << "Hello, World!" << std::endl;\n return 0; }';
+                break;
+            case 'DART':
+                this.content = 'void main() {\n print("Hello World"); \n}';
                 break;
             default:
-                this.content = ''; // Default empty content
+                this.content = '';
         }
     }
     next();
