@@ -8,9 +8,7 @@ An innovative **Online Coding Compiler** that offers a versatile platform for pr
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
 - [Getting Started](#getting-started)
-- [API Endpoints](#api-endpoints)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## 🌟 Features
 - **Multi-language Support:** Write, compile, and execute code in multiple languages including **JavaScript**, **Python**, and **Dart**.
@@ -52,10 +50,11 @@ The application uses a **client-server architecture** with the frontend built on
 3. Setting up Docker.
 The code execution is handled within Docker containers. To build and run containers
 The following docker images have been used to provide runtime for multiple languages
-| Language | Docker Image | Description |
-|--|--|--|
-| Node.js | node:14 | Provides Node.js runtime environment for JavaScript code execution.|
-|Python| python:3.9.18-alpine3.18|Provides Python runtime environment for Python code execution.|
+
+	| Language | Docker Image              | Description                                                |
+	|----------|----------------------------|------------------------------------------------------------|
+	| Node.js  | `node:14`                  | Provides Node.js runtime environment for JavaScript code execution. |
+	| Python   | `python:3.9.18-alpine3.18` | Provides Python runtime environment for Python code execution. |
 4. Run the server.
 	```bash
 	npm start
