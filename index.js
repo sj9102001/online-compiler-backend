@@ -11,8 +11,9 @@ const executeRoutes = require('./routes/executeRoutes');
 const { verifyUser } = require('./middlewares/verifyUser');
 
 const port = process.env.PORT | 8080;
+const mongoDbUri = process.env.MONGODB_URI;
 
-mongoose.connect('mongodb://127.0.0.1/onlinecompiler', {
+mongoose.connect(mongoDbUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
